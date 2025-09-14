@@ -2,6 +2,7 @@ import sys
 
 """
 Each one write his code in a function and all functions calls should be in the gui function
+Its preffered to make your model in another file then import it
 """
 class mainapp:
     def __init__(self):
