@@ -1,0 +1,71 @@
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+from xgboost import XGBClassifier
+from sklearn.metrics import accuracy_score, precision_score, roc_auc_score
+import shap
+import matplotlib.pyplot as plt
+
+
+
+class fault_label:
+    def __init__(self):
+        try:
+            data = ""
+            target = ""
+            skipped = None
+            df = pd.read_csv(data)
+            self.target_column = target   # change if your target column has a different name
+            self.skipped_clms = [skipped, target]
+            self.label_encoders = {}
+            for col in df.columns:
+                if df[col].dtype == "object":  # العمود نصي
+                    le = LabelEncoder()
+                    df[col] = le.fit_transform(df[col])
+                    self.label_encoders[col] = le  # نخزن المشفر لو احتجناه لاحقاً
+            try:
+                X = df.drop(columns= self.skipped_clms, axis=1)
+                y = df[self.target_column]  
+                
+                self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
+                    X, y, test_size=0.2, random_state=42   
+                ) 
+                num_classes = len(np.unique(y))
+                self.model = XGBClassifier(
+                            n_estimators=1,
+                            max_depth=5,
+                            learning_rate=0.2,
+                            subsample=0.9,
+                            colsample_bytree=0.9,
+                            reg_lambda=1.0,
+                            objective="multi:softprob" if num_classes > 2 else "binary:logistic",
+                            eval_metric="mlogloss" if num_classes > 2 else "logloss",
+                            # tree_method="hist"
+                        )
+            except:
+                raise("Target or skipped columns are not in the file")
+        except:
+            raise("can not open the data file")
+        
+    def on_fit_model(self):
+        self.model.fit(self.X_train, self.y_train)
+        y_pred = self.model.predict(self.X_test)
+        y_proba = self.model.predict_proba(self.X_test)  # for AUC
+        acc = accuracy_score(self.y_test, y_pred)
+        print(f"Accuracy: {acc:.4f}")
+        prec = precision_score(self.y_test, y_pred, average='macro')  
+        print(f"Precision (macro): {prec:.4f}")
+        auc = roc_auc_score(self.y_test, y_proba, multi_class='ovr')  
+        print(f"AUC: {auc:.4f}")
+        
+    def shap_explain(self):
+        self.explainer = shap.TreeExplainer(self.model, self.X_train)
+        self.shap_values = self.explainer.shap_values(self.X_test)
+
+    def test_with_given_data(self):
+        testdata = ""
+        self.test_df = pd.read_csv(testdata)
+        test_df = test_df.drop(columns=self.skipped_clms, errors='ignore',axis=1)
+        predicted_fault = self.model.predict(test_df)
+        print("Predicted RUL:", predicted_fault[0])
