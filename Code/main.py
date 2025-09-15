@@ -1,5 +1,5 @@
 import sys 
-from Fault_label import fault_label
+from Fault_label import fault_label, fault_label_predict
 
 """
 Each one write his code in a function and all functions calls should be in the gui function
