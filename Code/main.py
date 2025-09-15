@@ -1,4 +1,5 @@
 import sys 
+from Fault_label import fault_label
 
 """
 Each one write his code in a function and all functions calls should be in the gui function
@@ -13,10 +14,6 @@ class mainapp:
         print("Project GUI")
         
 
-def fault_label():
-    # this function for fault label model
-    print("Fault Label")
-
 def fault_type():
     # this function for fault type model
     print("Fault Type")
@@ -30,3 +27,4 @@ def project_gui():
     print("Project GUI")
 
 print("Welcome to the Fault Diagnosis System")
+

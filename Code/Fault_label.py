@@ -8,16 +8,15 @@ import shap
 import matplotlib.pyplot as plt
 
 
-
 class fault_label:
-    def __init__(self):
+    def __init__(self, data, target, skipped):
         try:
-            data = ""
-            target = ""
-            skipped = None
             df = pd.read_csv(data)
             self.target_column = target   # change if your target column has a different name
-            self.skipped_clms = [skipped, target]
+            if skipped is None:
+                self.skipped_clms = [target]
+            else:
+                self.skipped_clms = list(skipped) + [target]
             self.label_encoders = {}
             for col in df.columns:
                 if df[col].dtype == "object":  # العمود نصي
@@ -41,31 +40,53 @@ class fault_label:
                             reg_lambda=1.0,
                             objective="multi:softprob" if num_classes > 2 else "binary:logistic",
                             eval_metric="mlogloss" if num_classes > 2 else "logloss",
-                            # tree_method="hist"
+                            tree_method="hist"
                         )
-            except:
-                raise("Target or skipped columns are not in the file")
-        except:
-            raise("can not open the data file")
+                
+            except KeyError:
+                raise ValueError("Target or skipped columns are not in the file")
+        except FileNotFoundError:
+            raise ValueError("Cannot open the data file")
         
-    def on_fit_model(self):
-        self.model.fit(self.X_train, self.y_train)
-        y_pred = self.model.predict(self.X_test)
-        y_proba = self.model.predict_proba(self.X_test)  # for AUC
-        acc = accuracy_score(self.y_test, y_pred)
-        print(f"Accuracy: {acc:.4f}")
-        prec = precision_score(self.y_test, y_pred, average='macro')  
-        print(f"Precision (macro): {prec:.4f}")
-        auc = roc_auc_score(self.y_test, y_proba, multi_class='ovr')  
-        print(f"AUC: {auc:.4f}")
+    def fit_model(self):
+        if self.model:
+            self.model.fit(self.X_train, self.y_train)
+            background = self.X_train.sample(1000, random_state=42)
+            self.explainer = shap.TreeExplainer(self.model)
+            y_pred = self.model.predict(self.X_test)
+            y_proba = self.model.predict_proba(self.X_test)  # for AUC
+            acc = accuracy_score(self.y_test, y_pred)
+            print(f"Accuracy: {acc:.4f}")
+            prec = precision_score(self.y_test, y_pred, average='macro')  
+            print(f"Precision (macro): {prec:.4f}")
+            auc = roc_auc_score(self.y_test, y_proba, multi_class='ovr')  
+            print(f"AUC: {auc:.4f}")
+            return f"AC: {acc}\nPrecision: {prec}\nAUC: {auc}"
         
-    def shap_explain(self):
-        self.explainer = shap.TreeExplainer(self.model, self.X_train)
-        self.shap_values = self.explainer.shap_values(self.X_test)
+        
+    def shap_explain(self, features, row_index=0):
+        self.shap_values = self.explainer.shap_values(features)
+        row_shap = self.shap_values[row_index]
+        total = np.sum(row_shap)
+        row_sums = np.sum(row_shap, axis=1)
+        clmns = features.columns
+        row_percent = (float(sum/total) for sum in row_sums)
+        zipped = zip(clmns, row_percent)
+        features_affect = dict(sorted(zipped, key=lambda x: x[1], reverse=True))
 
-    def test_with_given_data(self):
-        testdata = ""
-        self.test_df = pd.read_csv(testdata)
-        test_df = test_df.drop(columns=self.skipped_clms, errors='ignore',axis=1)
-        predicted_fault = self.model.predict(test_df)
-        print("Predicted RUL:", predicted_fault[0])
+        for feature, value in features_affect.items():
+            print(f"{feature}: {value:.4f}")
+
+        return f"The data affect of the row {row_index} is:\n{features_affect}"
+
+       
+
+    def predict_model(self, testdata):
+        try:
+            self.test_df = pd.read_csv(testdata)
+            test_df = test_df.drop(columns=self.skipped_clms, errors='ignore',axis=1)
+            predicted_fault = self.model.predict(test_df)
+            return predicted_fault
+            # print("Predicted RUL:", predicted_fault[0])
+        except FileNotFoundError:
+            raise ValueError("Cannot open the data file")
