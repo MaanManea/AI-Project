@@ -6,14 +6,14 @@ import pandas as pd
 import itertools
 
 # from Fault_rul import fault_rul
-from Fault_api import fault_api
+# from Fault_api import fault_api
 
 current_dir = os.path.dirname(__file__)
 models_folder = os.path.join(current_dir, r"../Models")
 
 FAULT_LABEL_MODEL_PATH = os.path.join(models_folder, r"fault_label_model.pkl")
 FAULT_TYPE_MODEL_PATH = os.path.join(models_folder, r"fault_type_model.pkl")
-FAULT_RUL_MODEL_PATH = os.path.join(models_folder, r"fault_rul_model.pkl")
+FAULT_RUL_MODEL_PATH = os.path.join(models_folder, r"xgboost_rul_raw.pkl")
 FAULT_EXPLAINER_MODEL_PATH = os.path.join(models_folder, r"fault_label_explainer.pkl")
 
 json_data_path = r"C:\Users\Maan\Desktop\9th Semester\AI Lab\Project1\changed_sensor_data.json"
@@ -53,17 +53,17 @@ class ModelLoader:
                 print(f"[ERROR] Failed to train/load Fault Type Model: {e}")
             raise FileNotFoundError(f"Fault Type Model not found at {FAULT_TYPE_MODEL_PATH}")
 
-    # def load_fault_rul_model(self):
-    #     if os.path.exists(FAULT_RUL_MODEL_PATH):
-    #         self.fault_rul_model = joblib.load(FAULT_RUL_MODEL_PATH)
-    #         print("✅ Fault RUL Model loaded successfully.")
-    #     else:
-    #         try:
-    #             self.fault_rul_model = fault_rul().model
-    #             print("✅ Fault Label Model trained and loaded successfully.")
-    #         except Exception as e:
-    #             print(f"[ERROR] Failed to train/load Fault Label Model: {e}")
-    #         raise FileNotFoundError(f"Fault RUL Model not found at {FAULT_RUL_MODEL_PATH}")
+    def load_fault_rul_model(self):
+        if os.path.exists(FAULT_RUL_MODEL_PATH):
+            self.fault_rul_model = joblib.load(FAULT_RUL_MODEL_PATH)
+            print("✅ Fault RUL Model loaded successfully.")
+        else:
+            try:
+                # self.fault_rul_model = fault_rul().model
+                print("✅ Fault Label Model trained and loaded successfully.")
+            except Exception as e:
+                print(f"[ERROR] Failed to train/load Fault Label Model: {e}")
+            raise FileNotFoundError(f"Fault RUL Model not found at {FAULT_RUL_MODEL_PATH}")
 
     def load_fault_explainer_model(self):
         if os.path.exists(FAULT_EXPLAINER_MODEL_PATH):
@@ -81,7 +81,7 @@ class ModelLoader:
     def load_all_models(self):
         self.load_fault_label_model()
         self.load_fault_type_model()
-        # self.load_fault_rul_model()
+        self.load_fault_rul_model()
         self.load_fault_explainer_model()
 
 def predict(model, data):
@@ -127,10 +127,12 @@ def on_label(label, model_loader, data):
         first_three = dict(itertools.islice(features_affect.items(), 3))
         features_text = ", ".join([f"{k}: {v}" for k, v in first_three.items()])
         rul = 0
-        api = fault_api(ftype, features_text, data)
+        # api = fault_api(ftype, features_text)
     return ftype, rul, features_text, api
 
 def predict_models():
+    # global json_data_path
+    # json_data_path = json_data_path
     model_loader = ModelLoader()
     data = load_json_data(json_data_path)
     label = predict(model_loader.fault_label_model, data)

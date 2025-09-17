@@ -1,5 +1,9 @@
+joblib==1.5.1
+matplotlib==3.10.6
 numpy==2.3.3
 pandas==2.3.2
+PyQt5==5.15.11
+PyQt5_sip==12.17.0
 scikit_learn==1.7.2
 shap==0.48.0
 xgboost==3.0.5

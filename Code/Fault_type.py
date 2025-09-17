@@ -62,10 +62,3 @@ class fault_type:
         print("\n✅ Accuracy:")
         print(accuracy_score(self.y_test, self.y_pred))
 
-
-fault_type()
-
-
-
-
-
