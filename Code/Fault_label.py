@@ -5,11 +5,21 @@ from sklearn.model_selection import train_test_split
 from xgboost import XGBClassifier
 from sklearn.metrics import accuracy_score, precision_score, roc_auc_score
 import shap
+from joblib import dump
+import os
 
+data = r"C:\Users\Maan\Desktop\9th Semester\AI Lab\selected_conveyor_data.csv"
+current_dir = os.path.dirname(__file__)
+models_folder = os.path.join(current_dir, r"../Models")
+FAULT_LABEL_MODEL_PATH = os.path.join(models_folder, r"fault_label_model.pkl")
+FAULT_EXPLAINER_MODEL_PATH = os.path.join(models_folder, r"fault_label_explainer.pkl")
 
 class fault_label:
-    def __init__(self, data, target, skipped):
+    def __init__(self):
         try:
+            target = "Fault_Label"
+            skipped = "Fault_Type","RUL_hours"
+             # Add more columns to skip if necessary
             df = pd.read_csv(data)
             self.target_column = target  
             if skipped is None:
@@ -53,7 +63,10 @@ class fault_label:
             self.model.fit(self.X_train, self.y_train)
             background = self.X_train.sample(1000, random_state=42)
             self.explainer = shap.TreeExplainer(self.model, background)
-            
+            dump(self.explainer, FAULT_EXPLAINER_MODEL_PATH)
+            dump(self.model, FAULT_LABEL_MODEL_PATH)
+
+
     def show_accuracy(self):
         if self.model:
             y_pred = self.model.predict(self.X_test)
@@ -66,36 +79,40 @@ class fault_label:
             print(f"AUC: {auc:.4f}")
             return f"AC: {acc}\nPrecision: {prec}\nAUC: {auc}"
         
-class fault_label_predict:
-    def __init__(self, model, explainer):
-        self.model = model
-        self.explainer = explainer
+# class fault_label_predict:
+#     def __init__(self, model, explainer):
+#         self.model = model
+#         self.explainer = explainer
 
-    def shap_explain(self, features, row_index=0):
-        self.shap_values = self.explainer.shap_values(features)
-        row_shap = self.shap_values[row_index]
-        total = np.sum(row_shap)
-        row_sums = np.sum(row_shap, axis=1)
-        clmns = features.columns
-        row_percent = (float(sum/total) for sum in row_sums)
-        zipped = zip(clmns, row_percent)
-        features_affect = dict(sorted(zipped, key=lambda x: x[1], reverse=True))
+#     def shap_explain(self, features, row_index=0):
+#         self.shap_values = self.explainer.shap_values(features)
+#         row_shap = self.shap_values[row_index]
+#         total = np.sum(row_shap)
+#         row_sums = np.sum(row_shap, axis=1)
+#         clmns = features.columns
+#         row_percent = (float(sum/total) for sum in row_sums)
+#         zipped = zip(clmns, row_percent)
+#         features_affect = dict(sorted(zipped, key=lambda x: x[1], reverse=True))
 
-        # for feature, value in features_affect.items():
-        #     print(f"{feature}: {value:.4f}")
+#         # for feature, value in features_affect.items():
+#         #     print(f"{feature}: {value:.4f}")
 
-        return f"The data affect of the row {row_index} is:\n{features_affect}"
+#         return f"The data affect of the row {row_index} is:\n{features_affect}"
 
-    def predict_model(self, testdatafile, target, skipped):
-        try:
-            if skipped is None:
-                self.skipped_clms = [target]
-            else:
-                self.skipped_clms = list(skipped) + [target]
-            self.test_df = pd.read_csv(testdatafile)
-            test_df = test_df.drop(columns=self.skipped_clms errors='ignore',axis=1)
-            predicted_fault = self.model.predict(test_df)
-            return predicted_fault
+#     def predict_model(self, testdatafile, target, skipped):
+#         try:
+#             if skipped is None:
+#                 self.skipped_clms = [target]
+#             else:
+#                 self.skipped_clms = list(skipped) + [target]
             
-        except FileNotFoundError:
-            raise ValueError("Cannot open the data file")
+#             self.test_df = pd.read_csv(testdatafile)
+#             if self.test_df.empty():
+#                 test_df = test_df.drop(columns=self.skipped_clms, errors='ignore',axis=1)
+#                 predicted_fault = self.model.predict(test_df)
+#                 return predicted_fault
+#             else:
+#                 raise ValueError("Cannot open the data file")
+            
+#         except FileNotFoundError:
+#             raise ValueError("Cannot open the data file")
