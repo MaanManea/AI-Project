@@ -1,0 +1,93 @@
+[
+  {
+    "Lifecycle_ID": 6,
+    "Repair_Flag": 0,
+    "Cycles_Completed": 392321,
+    "Motor_Current_mean (A)": 8.239,
+    "Vibration_max (G)": 0.505,
+    "Vibration_std (G)": 0.085,
+    "Vibration_high_freq_mean (G)": 0.085,
+    "Temperature_mean (°C)": 49.973,
+    "Pressure_mean (kPa)": 152.19,
+    "Acoustic_mean (dB)": 69.403,
+    "Humidity_mean (%)": 50.61
+  },
+  {
+    "Lifecycle_ID": 6,
+    "Repair_Flag": 0,
+    "Cycles_Completed": 392322,
+    "Motor_Current_mean (A)": 8.246,
+    "Vibration_max (G)": 0.516,
+    "Vibration_std (G)": 0.074,
+    "Vibration_high_freq_mean (G)": 0.083,
+    "Temperature_mean (°C)": 49.851,
+    "Pressure_mean (kPa)": 152.22,
+    "Acoustic_mean (dB)": 69.386,
+    "Humidity_mean (%)": 49.82
+  },
+  {
+    "Lifecycle_ID": 6,
+    "Repair_Flag": 0,
+    "Cycles_Completed": 392323,
+    "Motor_Current_mean (A)": 8.3,
+    "Vibration_max (G)": 0.528,
+    "Vibration_std (G)": 0.071,
+    "Vibration_high_freq_mean (G)": 0.084,
+    "Temperature_mean (°C)": 50.081,
+    "Pressure_mean (kPa)": 152.32,
+    "Acoustic_mean (dB)": 69.353,
+    "Humidity_mean (%)": 50
+  },
+  {
+    "Lifecycle_ID": 6,
+    "Repair_Flag": 0,
+    "Cycles_Completed": 392324,
+    "Motor_Current_mean (A)": 8.232,
+    "Vibration_max (G)": 0.498,
+    "Vibration_std (G)": 0.071,
+    "Vibration_high_freq_mean (G)": 0.079,
+    "Temperature_mean (°C)": 49.912,
+    "Pressure_mean (kPa)": 152.13,
+    "Acoustic_mean (dB)": 69.372,
+    "Humidity_mean (%)": 50.05
+  },
+  {
+    "Lifecycle_ID": 6,
+    "Repair_Flag": 0,
+    "Cycles_Completed": 392325,
+    "Motor_Current_mean (A)": 8.258,
+    "Vibration_max (G)": 0.514,
+    "Vibration_std (G)": 0.068,
+    "Vibration_high_freq_mean (G)": 0.079,
+    "Temperature_mean (°C)": 50,
+    "Pressure_mean (kPa)": 152.11,
+    "Acoustic_mean (dB)": 69.374,
+    "Humidity_mean (%)": 49.96
+  },
+  {
+    "Lifecycle_ID": 6,
+    "Repair_Flag": 0,
+    "Cycles_Completed": 392326,
+    "Motor_Current_mean (A)": 8.389,
+    "Vibration_max (G)": 0.519,
+    "Vibration_std (G)": 0.071,
+    "Vibration_high_freq_mean (G)": 0.085,
+    "Temperature_mean (°C)": 49.935,
+    "Pressure_mean (kPa)": 152.1,
+    "Acoustic_mean (dB)": 69.235,
+    "Humidity_mean (%)": 49.88
+  },
+{
+    "Lifecycle_ID": 6,
+    "Repair_Flag": 0,
+    "Cycles_Completed": 392327,
+    "Motor_Current_mean (A)": 8.4,
+    "Vibration_max (G)": 0.551,
+    "Vibration_std (G)": 0.073,
+    "Vibration_high_freq_mean (G)": 0.084,
+    "Temperature_mean (°C)": 49.935,
+    "Pressure_mean (kPa)": 152.13,
+    "Acoustic_mean (dB)": 69.206,
+    "Humidity_mean (%)": 50.19
+}
+]

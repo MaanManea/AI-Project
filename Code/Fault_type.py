@@ -8,7 +8,10 @@ current_dir = os.path.dirname(__file__)
 models_folder = os.path.join(current_dir, r"../Models")
 FAULT_TYPE_MODEL_PATH = os.path.join(models_folder, r"fault_type_model.pkl")
 
-csv_path  = r"C:\Users\Maan\Desktop\9th Semester\AI Lab\selected_conveyor_data.csv"
+data_folder = os.path.join(current_dir, r"../Data")
+csv_path = os.path.join(data_folder, r"conveyor_data.csv")
+
+# csv_path  = r"C:\Users\Maan\Desktop\9th Semester\AI Lab\selected_conveyor_data.csv"
 class fault_type:
     def __init__(self):
         self.model = GradientBoostingClassifier(

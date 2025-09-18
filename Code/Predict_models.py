@@ -4,19 +4,20 @@ import numpy as np
 import os
 import pandas as pd
 import itertools
-
-# from Fault_rul import fault_rul
-# from Fault_api import fault_api
+from Fault_api import fault_api
 
 current_dir = os.path.dirname(__file__)
 models_folder = os.path.join(current_dir, r"../Models")
 
 FAULT_LABEL_MODEL_PATH = os.path.join(models_folder, r"fault_label_model.pkl")
 FAULT_TYPE_MODEL_PATH = os.path.join(models_folder, r"fault_type_model.pkl")
-FAULT_RUL_MODEL_PATH = os.path.join(models_folder, r"xgboost_rul_raw.pkl")
+FAULT_RUL_MODEL_PATH = os.path.join(models_folder, r"fault_rul_model.pkl")
 FAULT_EXPLAINER_MODEL_PATH = os.path.join(models_folder, r"fault_label_explainer.pkl")
 
-json_data_path = r"C:\Users\Maan\Desktop\9th Semester\AI Lab\Project1\changed_sensor_data.json"
+# data_folder = os.path.join(current_dir, r"../Data")
+# DATA = os.path.join(data_folder, r"conveyor_data.csv")
+
+json_data_path = r"C:\Users\Maan\Desktop\9th Semester\AI Lab\Project\Data\sample_data_for_2label_test.json"
 
 class ModelLoader:
     def __init__(self):
@@ -81,7 +82,7 @@ class ModelLoader:
     def load_all_models(self):
         self.load_fault_label_model()
         self.load_fault_type_model()
-        self.load_fault_rul_model()
+        # self.load_fault_rul_model()
         self.load_fault_explainer_model()
 
 def predict(model, data):
@@ -114,7 +115,7 @@ def on_label(label, model_loader, data):
         api = None
     else:
         ftype = predict(model_loader.fault_type_model, data)
-        df = pd.read_json(json_data_path)
+        df = pd.DataFrame(data)
         explain = model_loader.fault_explainer_model.shap_values(df)
         row_shap = explain[0]
         total = np.sum(row_shap)
@@ -127,14 +128,20 @@ def on_label(label, model_loader, data):
         first_three = dict(itertools.islice(features_affect.items(), 3))
         features_text = ", ".join([f"{k}: {v}" for k, v in first_three.items()])
         rul = 0
-        # api = fault_api(ftype, features_text)
-    return ftype, rul, features_text, api
+        api = fault_api(ftype, features_text)
+    result = {
+        "Ftype":ftype,
+        "RUL": rul,
+        "Featurs text": features_text,
+        "API": api
+    }
+    return result
 
-def predict_models():
+def predict_models(data):
     # global json_data_path
     # json_data_path = json_data_path
     model_loader = ModelLoader()
-    data = load_json_data(json_data_path)
+    # data = load_json_data(json_data_path)
     label = predict(model_loader.fault_label_model, data)
     results = on_label(label, model_loader, data)
     return results

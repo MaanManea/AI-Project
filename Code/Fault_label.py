@@ -8,11 +8,14 @@ import shap
 from joblib import dump
 import os
 
-data = r"C:\Users\Maan\Desktop\9th Semester\AI Lab\selected_conveyor_data.csv"
+# data = r"C:\Users\Maan\Desktop\9th Semester\AI Lab\selected_conveyor_data.csv"
 current_dir = os.path.dirname(__file__)
 models_folder = os.path.join(current_dir, r"../Models")
 FAULT_LABEL_MODEL_PATH = os.path.join(models_folder, r"fault_label_model.pkl")
 FAULT_EXPLAINER_MODEL_PATH = os.path.join(models_folder, r"fault_label_explainer.pkl")
+
+data_folder = os.path.join(current_dir, r"../Data")
+data = os.path.join(data_folder, r"conveyor_data.csv")
 
 class fault_label:
     def __init__(self):
