@@ -46,12 +46,7 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     print("Sensor received control:", msg.payload.decode())
 
-client = make_client(CLIENT_ID, USER, PASS, HOST, PORT, STATUS_TOPIC)
-client.on_connect = on_connect
-client.on_message = on_message
 
-client.connect(HOST, PORT)
-threading.Thread(target=client.loop_forever, daemon=True).start()
 # client.loop_start()
 def load_json_data(json_path):
     if not os.path.exists(json_path):
@@ -60,10 +55,22 @@ def load_json_data(json_path):
     with open(json_path, "r") as file:
         return json.load(file)
 # simulate sending sensor data
-while True:
-    # data = {"sensor": "temp1", "value": 25.2, "unit": "C", "ts": datetime.now(tz=timezone.utc).isoformat()}
-    data = load_json_data(data_file)
-    # data = generate_sensor_data()
-    client.publish(SEND_TOPIC, json.dumps(data), qos=1)
-    print("Sensor sent:", data)
+running = True
+def start_sensor():
+    client = make_client(CLIENT_ID, USER, PASS, HOST, PORT, STATUS_TOPIC)
+    client.on_connect = on_connect
+    client.on_message = on_message
+
+    client.connect(HOST, PORT)
+    threading.Thread(target=client.loop_forever, daemon=True).start()
+    while running:
+        # data = {"sensor": "temp1", "value": 25.2, "unit": "C", "ts": datetime.now(tz=timezone.utc).isoformat()}
+        data = load_json_data(data_file)
+        # data = generate_sensor_data()
+        client.publish(SEND_TOPIC, json.dumps(data), qos=1)
+        # print("Sensor sent:", data)
+        time.sleep(10)  # send data every 10 seconds
     time.sleep(5)
+def stop_sensor():
+    global running
+    running = False

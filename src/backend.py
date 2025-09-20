@@ -28,23 +28,27 @@ def on_message(client, userdata, msg):
     if msg.topic == "backend/sensor":
         payload = json.loads(msg.payload.decode())
         # preprocessed = [payload]
-        print("Processor got sensor data:", payload)
+        # print("Processor got sensor data:", payload)
         processed = predict_models(payload)
         client.publish(SEND_TOPIC, json.dumps(processed), qos=1)
         print("Processor sent processed data:", processed)
     else:
         print("Processor received control:", msg.payload.decode())
+running = True
+def start_backend():
+    client = make_client(CLIENT_ID, USER, PASS, HOST, PORT, STATUS_TOPIC)
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.connect(HOST, PORT)
+    threading.Thread(target=client.loop_forever, daemon=True).start()
 
-client = make_client(CLIENT_ID, USER, PASS, HOST, PORT, STATUS_TOPIC)
-client.on_connect = on_connect
-client.on_message = on_message
+    try:
+        while running:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        print("Shutting down...")
+        client.disconnect()
 
-client.connect(HOST, PORT)
-threading.Thread(target=client.loop_forever, daemon=True).start()
-try:
-    while True:
-        time.sleep(1)
-except KeyboardInterrupt:
-    print("Shutting down...")
-    client.disconnect()
-
+def stop_backend():
+    global running
+    running = False
